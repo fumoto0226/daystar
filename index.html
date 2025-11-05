@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>进度条 + Logo 互动页面</title>
+
+<!-- 进度条 & 按钮样式 -->
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+        background: #f5f5f5;
+    }
+
+    img {
+        width: 200px;
+        transition: opacity 0.5s;
+        margin-bottom: 30px;
+    }
+
+    .progress-container {
+        width: 80%;
+        background: #ddd;
+        border-radius: 10px;
+        height: 25px;
+        overflow: hidden;
+        margin-bottom: 30px;
+    }
+
+    .progress-bar {
+        height: 25px;
+        width: 0%;
+        background: #007bff;
+        transition: width 0.5s;
+    }
+
+    button {
+        padding: 15px 40px;
+        border: none;
+        border-radius: 10px;
+        background: #007bff;
+        color: white;
+        font-size: 18px;
+        cursor: pointer;
+        transition: opacity 0.3s;
+    }
+
+    button:disabled {
+        background: #888;
+        cursor: not-allowed;
+    }
+</style>
+</head>
+<body>
+
+<!-- logo -->
+<img id="logo" src="img/logo.svg" style="opacity: 0.1;">
+
+<!-- 进度条 -->
+<div class="progress-container">
+    <div id="progressBar" class="progress-bar"></div>
+</div>
+
+<!-- 按钮 -->
+<button id="actionBtn">点我 +1</button>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore-compat.js"></script>
+
+<script>
+/*** ✅ ① 初始化 Firebase 配置（换成你自己的） ***/
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "xxxxxx",
+    appId: "xxxxxx"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+const TARGET = 100; // ✅ 设置目标次数
+
+const progressBar = document.getElementById("progressBar");
+const button = document.getElementById("actionBtn");
+const logo = document.getElementById("logo");
+
+let userIP = "";
+let clicked = false;
+
+/*** ✅ ② 获取用户IP ***/
+fetch("https://api.ipify.org?format=json")
+    .then(res => res.json())
+    .then(data => {
+        userIP = data.ip;
+        checkIP();
+    });
+
+/*** ✅ 查询 Firestore 是否已经点过 ***/
+function checkIP() {
+    db.collection("clickUsers").doc(userIP).get().then(doc => {
+        if (doc.exists) {
+            disableButton();
+        }
+    });
+
+    updateProgress();
+}
+
+/*** ✅ 更新进度条和 logo 透明度 ***/
+function updateProgress() {
+    db.collection("counter").doc("global")
+        .onSnapshot(doc => {
+            let count = doc.data()?.count || 0;
+            let percent = Math.min((count / TARGET) * 100, 100);
+
+            progressBar.style.width = percent + "%";
+            logo.style.opacity = (percent / 100);
+
+            if (percent >= 100) {
+                disableButton(true);
+            }
+        });
+}
+
+/*** ✅ 点击按钮事件 ***/
+button.addEventListener("click", async () => {
+
+    // 防止重复触发
+    if (clicked) return;
+    clicked = true;
+
+    // IP 写入数据库（记录用户按过）
+    await db.collection("clickUsers").doc(userIP).set({ clicked: true });
+
+    // 计数 +1（使用事务避免冲突）
+    const counter = db.collection("counter").doc("global");
+    await counter.set({ count: firebase.firestore.FieldValue.increment(1) }, { merge: true });
+
+    disableButton();
+});
+
+/*** ✅ 按钮禁用 + 修改文字 ***/
+function disableButton(isComplete = false) {
+    button.disabled = true;
+    button.style.opacity = 0.5;
+    button.innerText = isComplete ? "完成 🎉" : "已参与 ✅";
+}
+</script>
+
+</body>
+</html>
