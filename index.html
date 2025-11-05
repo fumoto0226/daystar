@@ -22,6 +22,9 @@
         width: 200px;
         transition: opacity 0.5s;
         margin-bottom: 30px;
+        -webkit-user-drag: none;
+        user-select: none;
+        pointer-events: auto;
     }
 
     .progress-container {
@@ -60,7 +63,7 @@
 <body>
 
 <!-- logo -->
-<img id="logo" src="img/logo.svg" style="opacity: 0.1;">
+<img id="logo" src="img/logo.svg" style="opacity: 0.1;" draggable="false">
 
 <!-- 进度条 -->
 <div class="progress-container">
@@ -77,12 +80,13 @@
 <script>
 /*** ✅ ① 初始化 Firebase 配置（换成你自己的） ***/
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "xxxxxx",
-    appId: "xxxxxx"
+  apiKey: "AIzaSyCr6sTD3muL72aBQMNOpYKSWFtIOwVicqc",
+  authDomain: "daystar-fmt2025.firebaseapp.com",
+  projectId: "daystar-fmt2025",
+  storageBucket: "daystar-fmt2025.firebasestorage.app",
+  messagingSenderId: "1049357312905",
+  appId: "1:1049357312905:web:81c12c7430f6b51930b758",
+  measurementId: "G-866GCNCKKW"
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
