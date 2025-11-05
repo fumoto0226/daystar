@@ -108,19 +108,19 @@ const button = document.getElementById("actionBtn");
 const logo = document.getElementById("logo");
 const countDisplay = document.getElementById("countDisplay");
 
-// 初始化 logo 透明度为 0，避免闪烁
+// 初始 logo 透明度为 0，避免闪烁
 logo.style.opacity = 0;
 
-let userIP = "";
 let clicked = false;
 
-/*** ✅ ② 获取用户IP ***/
-fetch("https://api.ipify.org?format=json")
-    .then(res => res.json())
-    .then(data => {
-        userIP = data.ip;
-        checkIP();
-    });
+/**** ✅ 获取用户唯一ID（代替IP，防止被墙） ****/
+let userIP = localStorage.getItem("userId");
+if (!userIP) {
+  userIP = "uid_" + Math.random().toString(36).slice(2);
+  localStorage.setItem("userId", userIP);
+}
+checkIP();
+
 
 /*** ✅ 查询 Firestore 是否已经点过 ***/
 function checkIP() {
