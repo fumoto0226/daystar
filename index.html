@@ -58,17 +58,27 @@
         background: #888;
         cursor: not-allowed;
     }
+
+    .count-display {
+        font-size: 20px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 20px;
+    }
 </style>
 </head>
 <body>
 
 <!-- logo -->
-<img id="logo" src="img/logo.svg" style="opacity: 0.1;" draggable="false">
+<img id="logo" src="img/logo.svg" draggable="false">
 
 <!-- 进度条 -->
 <div class="progress-container">
     <div id="progressBar" class="progress-bar"></div>
 </div>
+
+<!-- 统计数字 -->
+<div id="countDisplay" class="count-display">0/100</div>
 
 <!-- 按钮 -->
 <button id="actionBtn">点我 +1</button>
@@ -96,6 +106,10 @@ const TARGET = 100; // ✅ 设置目标次数
 const progressBar = document.getElementById("progressBar");
 const button = document.getElementById("actionBtn");
 const logo = document.getElementById("logo");
+const countDisplay = document.getElementById("countDisplay");
+
+// 初始化 logo 透明度为 0，避免闪烁
+logo.style.opacity = 0;
 
 let userIP = "";
 let clicked = false;
@@ -128,6 +142,7 @@ function updateProgress() {
 
             progressBar.style.width = percent + "%";
             logo.style.opacity = (percent / 100);
+            countDisplay.innerText = `${count}/${TARGET}`;
 
             if (percent >= 100) {
                 disableButton(true);
