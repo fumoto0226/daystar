@@ -7,15 +7,52 @@
 
 <!-- 进度条 & 按钮样式 -->
 <style>
+    @keyframes gradient-shift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    @keyframes glow-pulse {
+        0%, 100% {
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5),
+                        0 0 40px rgba(255, 0, 255, 0.3),
+                        0 0 60px rgba(0, 255, 255, 0.2);
+        }
+        50% {
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.8),
+                        0 0 60px rgba(255, 0, 255, 0.5),
+                        0 0 90px rgba(0, 255, 255, 0.3);
+        }
+    }
+
+    @keyframes button-click {
+        0% { transform: scale(1); }
+        50% { transform: scale(0.95); }
+        100% { transform: scale(1); }
+    }
+
+    @keyframes ripple {
+        0% {
+            transform: scale(0);
+            opacity: 1;
+        }
+        100% {
+            transform: scale(4);
+            opacity: 0;
+        }
+    }
+
     body {
-        font-family: Arial, sans-serif;
+        font-family: 'Arial', sans-serif;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         height: 100vh;
         margin: 0;
-        background: #f5f5f5;
+        background: #000;
+        overflow: hidden;
     }
 
     img {
@@ -25,45 +62,137 @@
         -webkit-user-drag: none;
         user-select: none;
         pointer-events: auto;
+        filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
     }
 
     .progress-container {
         width: 80%;
-        background: #ddd;
-        border-radius: 10px;
-        height: 25px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        height: 30px;
         overflow: hidden;
         margin-bottom: 30px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
     }
 
     .progress-bar {
-        height: 25px;
+        height: 100%;
         width: 0%;
-        background: #007bff;
-        transition: width 0.5s;
+        background: linear-gradient(90deg, 
+            #ff0080, 
+            #ff8c00, 
+            #ffd700, 
+            #32cd32, 
+            #00bfff, 
+            #8a2be2, 
+            #ff0080);
+        background-size: 200% 100%;
+        animation: gradient-shift 3s ease infinite;
+        transition: width 0.5s ease;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.6),
+                    0 0 40px rgba(255, 0, 255, 0.4),
+                    inset 0 0 20px rgba(255, 255, 255, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .progress-bar::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(90deg, 
+            transparent, 
+            rgba(255, 255, 255, 0.4), 
+            transparent);
+        animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
     }
 
     button {
         padding: 15px 40px;
-        border: none;
-        border-radius: 10px;
-        background: #007bff;
+        border: 2px solid transparent;
+        border-radius: 50px;
+        background: linear-gradient(135deg, 
+            #667eea 0%, 
+            #764ba2 25%, 
+            #f093fb 50%, 
+            #4facfe 75%, 
+            #00f2fe 100%);
+        background-size: 300% 300%;
+        animation: gradient-shift 4s ease infinite;
         color: white;
         font-size: 18px;
+        font-weight: bold;
         cursor: pointer;
-        transition: opacity 0.3s;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 0 20px rgba(102, 126, 234, 0.5),
+                    0 0 40px rgba(118, 75, 162, 0.3),
+                    0 4px 15px rgba(0, 0, 0, 0.3);
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    }
+
+    button::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.5);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+    }
+
+    button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0 30px rgba(102, 126, 234, 0.8),
+                    0 0 60px rgba(118, 75, 162, 0.5),
+                    0 6px 20px rgba(0, 0, 0, 0.4);
+        animation: glow-pulse 1.5s ease infinite;
+    }
+
+    button:active {
+        animation: button-click 0.3s ease;
+    }
+
+    button:active::before {
+        width: 300px;
+        height: 300px;
     }
 
     button:disabled {
-        background: #888;
+        background: linear-gradient(135deg, #444, #666);
         cursor: not-allowed;
+        animation: none;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        opacity: 0.6;
+    }
+
+    button:disabled:hover {
+        transform: none;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
     }
 
     .count-display {
-        font-size: 20px;
+        font-size: 24px;
         font-weight: bold;
-        color: #333;
+        color: #fff;
         margin-bottom: 20px;
+        text-shadow: 0 0 10px rgba(0, 255, 255, 0.8),
+                     0 0 20px rgba(255, 0, 255, 0.5);
+        letter-spacing: 2px;
     }
 </style>
 </head>
@@ -88,6 +217,22 @@
 <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore-compat.js"></script>
 
 <script>
+/*** 
+ * ========== 【IP限制功能说明】==========
+ * 当前IP限制功能已暂时禁用（代码已注释）
+ * 
+ * 如需恢复IP限制，请取消以下位置的注释：
+ * 1. 第243-244行：clicked 变量声明
+ * 2. 第247-253行：userIP 获取和 checkIP() 调用
+ * 3. 第258-268行：checkIP() 函数定义
+ * 4. 第290-293行：点击事件中的重复点击检查
+ * 5. 第304-306行：点击事件中的IP写入数据库
+ * 6. 第312-313行：点击事件中的按钮禁用
+ * 
+ * 搜索 "【IP限制相关】" 可快速定位所有相关代码
+ * ==========================================
+ ***/
+
 /*** ✅ ① 初始化 Firebase 配置（换成你自己的） ***/
 const firebaseConfig = {
   apiKey: "AIzaSyCr6sTD3muL72aBQMNOpYKSWFtIOwVicqc",
@@ -102,6 +247,8 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 const TARGET = 100; // ✅ 设置目标次数
+const LOGO_DEFAULT_SRC = "img/logo.svg";
+const LOGO_QR_SRC = "img/qr.png";
 
 const progressBar = document.getElementById("progressBar");
 const button = document.getElementById("actionBtn");
@@ -110,28 +257,34 @@ const countDisplay = document.getElementById("countDisplay");
 
 // 初始 logo 透明度为 0，避免闪烁
 logo.style.opacity = 0;
+logo.src = LOGO_DEFAULT_SRC;
 
-let clicked = false;
+// ========== 【IP限制相关】如需恢复限制，取消以下注释 ==========
+// let clicked = false;
 
 /**** ✅ 获取用户唯一ID（代替IP，防止被墙） ****/
-let userIP = localStorage.getItem("userId");
-if (!userIP) {
-  userIP = "uid_" + Math.random().toString(36).slice(2);
-  localStorage.setItem("userId", userIP);
-}
-checkIP();
+// ========== 【IP限制相关】如需恢复限制，取消以下注释 ==========
+// let userIP = localStorage.getItem("userId");
+// if (!userIP) {
+//   userIP = "uid_" + Math.random().toString(36).slice(2);
+//   localStorage.setItem("userId", userIP);
+// }
+// checkIP();
 
+// 暂时直接调用更新进度，不检查IP限制
+updateProgress();
 
-/*** ✅ 查询 Firestore 是否已经点过 ***/
-function checkIP() {
-    db.collection("clickUsers").doc(userIP).get().then(doc => {
-        if (doc.exists) {
-            disableButton();
-        }
-    });
-
-    updateProgress();
-}
+// ========== 【IP限制相关】如需恢复限制，取消以下注释 ==========
+// /*** ✅ 查询 Firestore 是否已经点过 ***/
+// function checkIP() {
+//     db.collection("clickUsers").doc(userIP).get().then(doc => {
+//         if (doc.exists) {
+//             disableButton();
+//         }
+//     });
+// 
+//     updateProgress();
+// }
 
 /*** ✅ 更新进度条和 logo 透明度 ***/
 function updateProgress() {
@@ -145,27 +298,89 @@ function updateProgress() {
             countDisplay.innerText = `${count}/${TARGET}`;
 
             if (percent >= 100) {
+                logo.src = LOGO_QR_SRC;
                 disableButton(true);
+            } else {
+                logo.src = LOGO_DEFAULT_SRC;
             }
         });
 }
 
 /*** ✅ 点击按钮事件 ***/
-button.addEventListener("click", async () => {
+button.addEventListener("click", async (event) => {
 
-    // 防止重复触发
-    if (clicked) return;
-    clicked = true;
+    // ========== 【IP限制相关】如需恢复限制，取消以下注释 ==========
+    // // 防止重复触发
+    // if (clicked) return;
+    // clicked = true;
 
-    // IP 写入数据库（记录用户按过）
-    await db.collection("clickUsers").doc(userIP).set({ clicked: true });
+    // 添加点击反馈效果
+    button.style.transform = "scale(0.9)";
+    setTimeout(() => {
+        button.style.transform = "";
+    }, 150);
+
+    // 创建点击粒子效果
+    createClickParticles(event);
+
+    // ========== 【IP限制相关】如需恢复限制，取消以下注释 ==========
+    // // IP 写入数据库（记录用户按过）
+    // await db.collection("clickUsers").doc(userIP).set({ clicked: true });
 
     // 计数 +1（使用事务避免冲突）
     const counter = db.collection("counter").doc("global");
     await counter.set({ count: firebase.firestore.FieldValue.increment(1) }, { merge: true });
 
-    disableButton();
+    // ========== 【IP限制相关】如需恢复限制，取消以下注释 ==========
+    // disableButton();
 });
+
+/*** ✅ 创建点击粒子效果 ***/
+function createClickParticles(event) {
+    const colors = ['#ff0080', '#ff8c00', '#ffd700', '#32cd32', '#00bfff', '#8a2be2', '#667eea', '#f093fb'];
+    const buttonRect = button.getBoundingClientRect();
+    const x = event.clientX - buttonRect.left;
+    const y = event.clientY - buttonRect.top;
+
+    for (let i = 0; i < 12; i++) {
+        const particle = document.createElement('div');
+        particle.style.position = 'fixed';
+        particle.style.left = (buttonRect.left + x) + 'px';
+        particle.style.top = (buttonRect.top + y) + 'px';
+        particle.style.width = '6px';
+        particle.style.height = '6px';
+        particle.style.borderRadius = '50%';
+        particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+        particle.style.pointerEvents = 'none';
+        particle.style.zIndex = '9999';
+        particle.style.boxShadow = `0 0 10px ${colors[Math.floor(Math.random() * colors.length)]}`;
+        
+        const angle = (Math.PI * 2 * i) / 12;
+        const velocity = 50 + Math.random() * 50;
+        const vx = Math.cos(angle) * velocity;
+        const vy = Math.sin(angle) * velocity;
+        
+        document.body.appendChild(particle);
+        
+        let opacity = 1;
+        let size = 6;
+        const animate = () => {
+            opacity -= 0.02;
+            size -= 0.1;
+            particle.style.opacity = opacity;
+            particle.style.width = size + 'px';
+            particle.style.height = size + 'px';
+            particle.style.transform = `translate(${vx * (1 - opacity)}px, ${vy * (1 - opacity)}px)`;
+            
+            if (opacity > 0) {
+                requestAnimationFrame(animate);
+            } else {
+                particle.remove();
+            }
+        };
+        requestAnimationFrame(animate);
+    }
+}
 
 /*** ✅ 按钮禁用 + 修改文字 ***/
 function disableButton(isComplete = false) {
